@@ -50,6 +50,19 @@ export const getAllGroups = async (req, res) => {
     const groups = await GroupTasks.find({ user_id: req.user.id }).populate(
       'tasks'
     );
+
+    if (!groups) {
+      return res
+        .status(StatusCodes.NOT_FOUND)
+        .json({ message: 'Group not found' });
+    }
+
+    if (req.user.id !== groups.user_id.toString()) {
+      return res
+        .status(StatusCodes.UNAUTHORIZED)
+        .json({ message: "You don't have access to update this group" });
+    }
+
     return res.status(StatusCodes.OK).json({ groups });
   } catch (err) {
     return res
